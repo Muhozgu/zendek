@@ -1,7 +1,7 @@
 """
 app.py
 ------
-BetIQ — Sports Betting AI Chatbot (CLI)
+Zendek — Sports Betting AI Chatbot (CLI)
 
 Commands
 --------
@@ -54,7 +54,7 @@ logging.basicConfig(
     format="%(asctime)s | %(levelname)-8s | %(name)s | %(message)s",
 )
 
-app     = typer.Typer(help="BetIQ — Sports Betting AI powered by Groq Llama + The Odds API")
+app     = typer.Typer(help="Zendek — Sports Betting AI powered by Groq Llama + The Odds API")
 console = Console()
 
 
@@ -87,7 +87,7 @@ def get_groq_client() -> GroqChatClient:
 def print_header() -> None:
     console.print()
     console.print(Panel(
-        "[bold green]BetIQ[/] — Sports Betting AI Analyst\n"
+        "[bold green]Zendek[/] — Sports Betting AI Analyst\n"
         "[dim]Powered by Groq Llama 3 + The Odds API[/]",
         border_style="green",
         padding=(0, 2),
@@ -158,7 +158,7 @@ def chat(
     no_stream: bool = typer.Option(False, "--no-stream", help="Disable streaming output"),
 ) -> None:
     """
-    🤖  Interactive chat with the BetIQ AI analyst.
+    🤖  Interactive chat with the Zendek.
 
     Optionally pre-loads live odds for a sport so the AI can answer
     specific questions about today's games.
@@ -211,7 +211,7 @@ def chat(
 
         # --- stream or single-shot ---
         console.print()
-        console.print("[bold green]BetIQ[/] ", end="")
+        console.print("[bold green]Zendek[/] ", end="")
 
         full_reply = ""
         if no_stream:
@@ -355,7 +355,7 @@ def analyze(
     console.print(f"\n[bold]AI Analysis — {sport.upper()}[/]\n")
     groq = get_groq_client()
 
-    console.print("[bold green]BetIQ[/] ", end="")
+    console.print("[bold green]Zendek[/] ", end="")
     for chunk in groq.stream(query, context=context):
         console.print(chunk, end="", markup=False)
     console.print("\n")
