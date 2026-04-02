@@ -1,7 +1,7 @@
 """
 api.py
 ------
-BetIQ — FastAPI REST backend.
+Zendek — FastAPI REST backend.
 
 Exposes JSON endpoints that a React/Next.js frontend (or any HTTP client) can call.
 
@@ -56,7 +56,7 @@ logger = logging.getLogger(__name__)
 # ── App setup ─────────────────────────────────────────────────────────────────
 
 app = FastAPI(
-    title="BetIQ API",
+    title="Zendek API",
     description="Sports Betting AI — Groq Llama 3 + The Odds API",
     version="1.0.0",
 )
