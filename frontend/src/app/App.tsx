@@ -56,7 +56,7 @@ function App() {
   ]);
 
   const [isTyping, setIsTyping] = useState(true);
-  const [status, setStatus] = useState<'online' | 'connecting' | 'offline'>('online');
+  const [status] = useState<'online' | 'connecting' | 'offline'>('online');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
