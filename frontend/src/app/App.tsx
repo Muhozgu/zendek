@@ -100,7 +100,7 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-100 md:bg-gray-200 flex items-center justify-center p-0 md:p-4 lg:p-8">
       {/* Chat Container */}
-      <div className="w-full h-screen md:h-[90vh] md:max-h-[800px] max-w-[480px] lg:max-w-[600px] bg-white md:rounded-2xl md:shadow-2xl overflow-hidden flex flex-col">
+      <div className="w-full h-screen md:h-[90vh] md:max-h-200 max-w-120 lg:max-w-150 bg-white md:rounded-2xl md:shadow-2xl overflow-hidden flex flex-col">
         {/* Header */}
         <ChatHeader 
           onClose={() => console.log('Close chat')}

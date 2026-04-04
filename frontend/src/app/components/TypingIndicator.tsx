@@ -4,7 +4,7 @@ import { MessageCircle } from 'lucide-react';
 export function TypingIndicator() {
   return (
     <div className="flex gap-3 mb-4">
-      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#1F3A5F] flex items-center justify-center">
+      <div className="shrink-0 w-8 h-8 rounded-full bg-[#1F3A5F] flex items-center justify-center">
         <MessageCircle className="w-4 h-4 text-white" />
       </div>
       <div>

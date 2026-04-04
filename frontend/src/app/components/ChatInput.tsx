@@ -22,14 +22,14 @@ export function ChatInput({ onSendMessage, disabled = false }: ChatInputProps) {
       <form onSubmit={handleSubmit} className="flex items-center gap-2">
         <button
           type="button"
-          className="hidden md:flex flex-shrink-0 w-9 h-9 items-center justify-center text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+          className="hidden md:flex shrink-0 w-9 h-9 items-center justify-center text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
           aria-label="Text size"
         >
           <Type className="w-5 h-5" />
         </button>
         <button
           type="button"
-          className="hidden md:flex flex-shrink-0 w-9 h-9 items-center justify-center text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+          className="hidden md:flex shrink-0 w-9 h-9 items-center justify-center text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
           aria-label="Audio"
         >
           <Volume2 className="w-5 h-5" />
@@ -47,7 +47,7 @@ export function ChatInput({ onSendMessage, disabled = false }: ChatInputProps) {
         <button
           type="submit"
           disabled={!message.trim() || disabled}
-          className="flex-shrink-0 w-11 h-11 bg-[#4A90E2] hover:bg-[#3A7BC8] disabled:bg-gray-300 disabled:cursor-not-allowed rounded-full flex items-center justify-center transition-colors shadow-md"
+          className="shrink-0 w-11 h-11 bg-[#4A90E2] hover:bg-[#3A7BC8] disabled:bg-gray-300 disabled:cursor-not-allowed rounded-full flex items-center justify-center transition-colors shadow-md"
           aria-label="Send message"
         >
           <Send className="w-5 h-5 text-white" />
