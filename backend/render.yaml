@@ -1,0 +1,26 @@
+# render.yaml  — place this in your backend (zendek/backend) root
+# Connect your GitHub repo at render.com → New Web Service → select repo
+
+services:
+  - type: web
+    name: betiq-api
+    runtime: python
+    region: oregon
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn api:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: GROQ_API_KEY
+        sync: false
+      - key: ODDS_API_KEY
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+      - key: GROQ_MODEL
+        value: llama-3.3-70b-versatile
+      - key: ODDS_REGION
+        value: us
+      - key: ODDS_FORMAT
+        value: american
+      - key: DEBUG
+        value: "false"

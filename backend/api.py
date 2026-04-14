@@ -1,26 +1,7 @@
 """
-api.py
-------
-Zendek — FastAPI REST backend.
-
-Exposes JSON endpoints that a React/Next.js frontend (or any HTTP client) can call.
-
-Run (dev):   uvicorn api:app --reload --port 8000
-Docs:        http://localhost:8000/docs   (auto-generated Swagger UI)
-
-Endpoints
----------
-GET  /health                     — health check
-GET  /sports                     — list all supported sports
-GET  /odds/{sport}               — fetch live odds
-GET  /odds/{sport}/best          — best odds per outcome (no full table)
-POST /chat                       — single-turn AI chat
-POST /chat/stream                — streaming AI chat (SSE)
-POST /analyze/{sport}            — AI analysis of a league/game
-POST /calculate/ev               — expected value
-POST /calculate/kelly            — Kelly Criterion
-POST /calculate/parlay           — parlay odds
-POST /calculate/bankroll         — bankroll management summary
+api.py  —  BetIQ FastAPI backend (production-ready)
+Run locally:  uvicorn api:app --reload --port 8000
+Deploy:       render.com — see render.yaml
 """
 
 from __future__ import annotations
@@ -53,17 +34,33 @@ load_dotenv()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# ── App setup ─────────────────────────────────────────────────────────────────
+# ── CORS origins ──────────────────────────────────────────────────────────────
+# Add your Vercel URL here. Wildcards are blocked by browsers for credentialed
+# requests, so list every origin explicitly.
+
+ALLOWED_ORIGINS = [
+    "http://localhost:5173",          # Vite dev server
+    "http://localhost:4173",          # Vite preview
+    "http://localhost:3000",          # fallback
+    os.getenv("FRONTEND_URL", ""),    # set this in Render dashboard → your Vercel URL
+                                      # e.g. https://betiq.vercel.app
+]
+
+# Filter out empty strings (when env var not set)
+ALLOWED_ORIGINS = [o for o in ALLOWED_ORIGINS if o]
+
+# ── App ───────────────────────────────────────────────────────────────────────
 
 app = FastAPI(
-    title="Zendek API",
-    description="Sports Betting AI — Groq Llama 3 + The Odds API",
+    title="BetIQ API",
+    description="Sports Betting AI — Groq Llama 3.3 + The Odds API",
     version="1.0.0",
 )
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],     # tighten in production: ["https://yourfrontend.com"]
+    allow_origins=ALLOWED_ORIGINS,
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -84,9 +81,9 @@ class ChatRequest(BaseModel):
 
 
 class EVRequest(BaseModel):
-    fair_prob:      float = Field(..., ge=0.01, le=0.99)
-    american_odds:  float
-    stake:          float = 100.0
+    fair_prob:     float = Field(..., ge=0.01, le=0.99)
+    american_odds: float
+    stake:         float = 100.0
 
 
 class KellyRequest(BaseModel):
@@ -129,9 +126,9 @@ def list_sports():
 
 @app.get("/odds/{sport}")
 def get_odds(
-    sport:      str,
-    market:     str = Query("h2h", enum=["h2h", "spreads", "totals"]),
-    max_games:  int = Query(10, ge=1, le=20),
+    sport:     str,
+    market:    str = Query("h2h", enum=["h2h", "spreads", "totals"]),
+    max_games: int = Query(10, ge=1, le=20),
 ):
     try:
         raw    = _odds.get_odds(sport, markets=market)
@@ -167,68 +164,29 @@ def get_odds(
     }
 
 
-@app.get("/odds/{sport}/best")
-def get_best_odds(
-    sport:  str,
-    market: str = Query("h2h"),
-):
-    """Return only the best available line per outcome for each game."""
-    try:
-        raw    = _odds.get_odds(sport, markets=market)
-        events = parse_events(raw)
-    except OddsAPIError as e:
-        raise HTTPException(status_code=e.status_code or 502, detail=str(e))
-
-    result = []
-    for ev in events:
-        best = OddsAnalyzer.best_available_odds(ev, market)
-        result.append({
-            "home": ev.home_team,
-            "away": ev.away_team,
-            "time": ev.commence_time,
-            "best": best,
-        })
-
-    return {"sport": sport, "games": result}
-
-
 @app.post("/chat")
 def chat(req: ChatRequest):
-    """Single-turn AI chat, optionally with live odds context."""
     context = _load_odds_context(req.sport, req.market) if req.sport else None
-
     reply, updated_history = _groq.chat_with_history(
-        req.message,
-        req.history,
-        context,
+        req.message, req.history, context,
     )
-
-    return {
-        "reply":   reply,
-        "history": updated_history,
-    }
+    return {"reply": reply, "history": updated_history}
 
 
 @app.post("/chat/stream")
 async def chat_stream(req: ChatRequest):
     """
-    Streaming chat via Server-Sent Events (SSE).
-
-    Each SSE event is:  data: <json>\n\n
-    Final event is:     data: [DONE]\n\n
+    Server-Sent Events streaming endpoint.
+    Each event:   data: {"chunk": "..."}\n\n
+    Final event:  data: [DONE]\n\n
     """
     context = _load_odds_context(req.sport, req.market) if req.sport else None
 
     async def event_generator() -> AsyncGenerator[str, None]:
-        loop = asyncio.get_event_loop()
-        gen  = _groq.stream(req.message, history=req.history, context=context)
-
-        # Run the synchronous generator in a thread pool
+        gen = _groq.stream(req.message, history=req.history, context=context)
         for chunk in gen:
-            payload = json.dumps({"chunk": chunk})
-            yield f"data: {payload}\n\n"
-            await asyncio.sleep(0)     # yield control to event loop
-
+            yield f"data: {json.dumps({'chunk': chunk})}\n\n"
+            await asyncio.sleep(0)
         yield "data: [DONE]\n\n"
 
     return StreamingResponse(
@@ -258,19 +216,13 @@ def analyze(
     if not events:
         raise HTTPException(status_code=404, detail="No matching events found.")
 
-    context = OddsAnalyzer.format_for_llm(events, market)
-    prompt  = (
+    context  = OddsAnalyzer.format_for_llm(events, market)
+    prompt   = (
         f"Analyze {'this game' if len(events)==1 else f'these {len(events)} upcoming games'}. "
         "For each: implied probabilities, vig, line discrepancies, best odds, value/arb flags."
     )
     analysis = _groq.chat(prompt, context=context)
-
-    return {
-        "sport":         sport,
-        "market":        market,
-        "events_analyzed": len(events),
-        "analysis":      analysis,
-    }
+    return {"sport": sport, "market": market, "events_analyzed": len(events), "analysis": analysis}
 
 
 @app.post("/calculate/ev")
@@ -278,7 +230,6 @@ def calculate_ev(req: EVRequest):
     dec = american_to_decimal(req.american_odds)
     ev  = expected_value(req.fair_prob, dec, req.stake)
     imp = 1.0 / dec
-
     return {
         "fair_prob":           req.fair_prob,
         "american_odds":       req.american_odds,
@@ -296,15 +247,12 @@ def calculate_ev(req: EVRequest):
 def calculate_kelly(req: KellyRequest):
     dec    = american_to_decimal(req.american_odds)
     result = kelly_criterion(req.fair_prob, dec, kelly_fraction=0.5)
-
     return {
         "fair_prob":          req.fair_prob,
         "american_odds":      req.american_odds,
         "decimal_odds":       result.decimal_odds,
         "edge":               result.edge,
-        "full_kelly_pct":     result.fraction_pct,
         "half_kelly_pct":     result.half_kelly * 100,
-        "quarter_kelly_pct":  result.quarter_kelly * 100,
         "half_kelly_dollars": round(req.bankroll * result.half_kelly, 2),
         "rationale":          result.rationale,
     }
@@ -315,10 +263,8 @@ def calculate_parlay(req: ParlayRequest):
     result = parlay_odds(req.legs, fmt="american")
     return {
         "legs":          req.legs,
-        "num_legs":      result["num_legs"],
         "decimal_odds":  result["decimal_odds"],
         "american_odds": result["american_odds"],
-        "implied_prob":  result["implied_prob"],
         "implied_pct":   result["implied_prob_pct"],
     }
 
