@@ -1,0 +1,34 @@
+<mxfile host="Electron">
+  <diagram name="Page-1" id="LsgWXlYQrr7qeR5IjZs5">
+    <mxGraphModel dx="1032" dy="688" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="4wFlkxSv2MSHMxXFbdwa-1" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Zendek" vertex="1">
+          <mxGeometry height="30" width="60" x="160" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="4wFlkxSv2MSHMxXFbdwa-2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Back-office&lt;div&gt;Player management&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="120" x="70" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="4wFlkxSv2MSHMxXFbdwa-3" parent="1" style="whiteSpace=wrap;html=1;" value="Main-Page" vertex="1">
+          <mxGeometry height="60" width="120" x="390" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="4wFlkxSv2MSHMxXFbdwa-4" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Customer Support Agent" vertex="1">
+          <mxGeometry height="30" width="110" x="395" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="4wFlkxSv2MSHMxXFbdwa-5" parent="1" style="whiteSpace=wrap;html=1;" value="Database" vertex="1">
+          <mxGeometry height="60" width="120" x="70" y="240" as="geometry" />
+        </mxCell>
+        <mxCell id="4wFlkxSv2MSHMxXFbdwa-7" parent="1" style="whiteSpace=wrap;html=1;" value="Login/sign-up" vertex="1">
+          <mxGeometry height="60" width="120" x="390" y="250" as="geometry" />
+        </mxCell>
+        <mxCell id="4wFlkxSv2MSHMxXFbdwa-8" parent="1" style="whiteSpace=wrap;html=1;" value="" vertex="1">
+          <mxGeometry height="60" width="120" x="390" y="370" as="geometry" />
+        </mxCell>
+        <mxCell id="4wFlkxSv2MSHMxXFbdwa-11" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Player" vertex="1">
+          <mxGeometry height="30" width="110" x="630" y="90" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
